@@ -64,7 +64,7 @@ Estado: en progreso. Placeholder, spawn y follow basico listos; falta conectar h
 - agregar tiempo, distancia y resolucion real
 - definir resultado de caza
 
-Estado: en progreso. `Search` y `Retrieve` ya pueden colgarse de una presa placeholder visible; faltan tiempo, distancia jugable real y resolucion de caza.
+Estado: en progreso. `Search` y `Retrieve` ya pueden colgarse de una presa placeholder visible, y `Search` mantiene al perro alrededor del objetivo; faltan tiempo, distancia jugable real y resolucion de caza.
 
 ### Fase 4. Integracion perro + presa
 - perro busca objetivo

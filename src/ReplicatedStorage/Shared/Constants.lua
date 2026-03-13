@@ -29,7 +29,7 @@ Constants.WorldDog = {
     SearchOffset = Vector3.new(0, 0, 10),
     RetrieveOffset = Vector3.new(2, 0, 7),
     FollowSpeed = 18,
-    TeleportDistance = 24,
+    TeleportDistance = 60,
     BillboardStudsOffset = Vector3.new(0, 4.5, 0),
 }
 
@@ -39,6 +39,7 @@ Constants.WorldPrey = {
     SearchLateralSpread = 12,
     RetrieveDistance = 10,
     BillboardStudsOffset = Vector3.new(0, 3.5, 0),
+    DogSearchOrbitOffset = Vector3.new(-4, 0, 3),
 }
 
 Constants.InputBindings = {

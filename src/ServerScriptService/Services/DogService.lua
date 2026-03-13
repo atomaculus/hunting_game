@@ -43,6 +43,25 @@ local function getTargetPosition(rootPart, offset)
     return Vector3.new(targetPosition.X, rootPart.Position.Y - 2.2, targetPosition.Z)
 end
 
+local function getDogTargetPosition(player, profile)
+    if profile.lastCommand == Constants.DogCommands.Search and profile.activePrey and profile.activePrey.instance then
+        local preyInstance = profile.activePrey.instance
+        if preyInstance.Parent then
+            local orbitOffset = Constants.WorldPrey.DogSearchOrbitOffset
+            local targetPosition = preyInstance.Position + Vector3.new(orbitOffset.X, 0, orbitOffset.Z)
+            return Vector3.new(targetPosition.X, preyInstance.Position.Y - 0.5, targetPosition.Z), preyInstance.Position - targetPosition
+        end
+    end
+
+    local rootPart = getCharacterRootPart(player)
+    if not rootPart then
+        return nil, nil
+    end
+
+    local offset = getWorldOffsetForCommand(profile.lastCommand)
+    return getTargetPosition(rootPart, offset), rootPart.CFrame.LookVector
+end
+
 local function createDogModel(profile, player)
     local model = Instance.new("Model")
     model.Name = string.format("%sDog", player.Name)
@@ -334,21 +353,19 @@ function DogService.init(dependencies)
         for player, profile in playerProfiles do
             local dogModel = profile.dogModel
             local body = dogModel and dogModel.PrimaryPart
-            local rootPart = getCharacterRootPart(player)
-            if body and rootPart then
-                local offset = getWorldOffsetForCommand(profile.lastCommand)
-                local targetPosition = getTargetPosition(rootPart, offset)
+            local targetPosition, facingDirection = getDogTargetPosition(player, profile)
+            if body and targetPosition and facingDirection then
 
                 local toTarget = targetPosition - body.Position
                 if toTarget.Magnitude > Constants.WorldDog.TeleportDistance then
-                    placeDogModel(dogModel, targetPosition, rootPart.CFrame.LookVector)
+                    placeDogModel(dogModel, targetPosition, facingDirection)
                 elseif toTarget.Magnitude > 0.05 then
                     local step = math.min(toTarget.Magnitude, Constants.WorldDog.FollowSpeed * deltaTime)
                     local nextPosition = body.Position + toTarget.Unit * step
-                    local facingDirection = toTarget.Magnitude > 0.4 and toTarget.Unit or rootPart.CFrame.LookVector
-                    placeDogModel(dogModel, nextPosition, facingDirection)
+                    local moveFacingDirection = toTarget.Magnitude > 0.4 and toTarget.Unit or facingDirection
+                    placeDogModel(dogModel, nextPosition, moveFacingDirection)
                 else
-                    placeDogModel(dogModel, body.Position, rootPart.CFrame.LookVector)
+                    placeDogModel(dogModel, body.Position, facingDirection)
                 end
             end
         end
