@@ -172,7 +172,8 @@ local function updateBillboard(profile)
     end
 
     local preyName = profile.activePrey and profile.activePrey.definition.displayName or "Sin presa"
-    label.Text = string.format("%s\n%s | %s\n%s", profile.dogName, profile.dogState, profile.lastCommand, preyName)
+    local preyState = profile.activePrey and profile.activePrey.state or "-"
+    label.Text = string.format("%s\n%s | %s\n%s | %s", profile.dogName, profile.dogState, profile.lastCommand, preyName, preyState)
 end
 
 local function buildInitialProfile()
@@ -197,6 +198,7 @@ local function buildStatusPayload(profile, message)
         dogState = profile.dogState,
         lastCommand = profile.lastCommand,
         activePreyName = profile.activePrey and profile.activePrey.definition.displayName or nil,
+        activePreyState = profile.activePrey and profile.activePrey.state or nil,
         baggedPrey = profile.baggedPrey,
         coins = profile.coins,
         message = message,
@@ -318,7 +320,7 @@ function DogService.init(dependencies)
                 profile.activePrey = activeTarget
                 profile.dogState = Constants.DogState.Healthy
                 message = string.format(
-                    "%s marco una presa en el mundo: %s. Acercate y usa C para cobrar.",
+                    "%s detecto %s y la esta marcando en el mundo. Espera a que quede lista para cobrar.",
                     profile.dogName,
                     profile.activePrey.definition.displayName
                 )
@@ -354,6 +356,17 @@ function DogService.init(dependencies)
             local dogModel = profile.dogModel
             local body = dogModel and dogModel.PrimaryPart
             local targetPosition, facingDirection = getDogTargetPosition(player, profile)
+            local stateChange = body and huntService:updateActiveTarget(player, body.Position)
+            if stateChange and profile.activePrey == stateChange then
+                updateBillboard(profile)
+                sendStatus(
+                    dogStatusRemote,
+                    player,
+                    profile,
+                    string.format("%s dejo %s lista para cobrar.", profile.dogName, stateChange.definition.displayName)
+                )
+            end
+
             if body and targetPosition and facingDirection then
 
                 local toTarget = targetPosition - body.Position

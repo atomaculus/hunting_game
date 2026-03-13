@@ -18,7 +18,7 @@ Contiene la autoridad del juego.
 
 - `Bootstrap.server.lua`: inicializa servicios y remotes.
 - `Services/DogService.lua`: seguimiento del estado del perro, hambre, comandos y placeholder visible en `Workspace`.
-- `Services/HuntService.lua`: spawns, placeholders de presas activas, deteccion, huida y resultado de la caza.
+- `Services/HuntService.lua`: spawns, placeholders de presas activas, estados de presa (`Detected` / `Retrievable`), deteccion, huida y resultado de la caza.
 - `Services/EconomyService.lua`: venta de presas, monedas y costos.
 
 ### StarterPlayerScripts
@@ -31,6 +31,7 @@ Contiene experiencia local del jugador.
 - El servidor decide economia, presas validas, resultados de caza y estado final del perro.
 - El cliente solo manda intenciones y muestra feedback.
 - La representacion visible inicial del perro tambien la crea y mueve el servidor para evitar divergencias cliente-servidor.
+- Las presas placeholder activas tambien viven en servidor y exponen un estado simple para que cliente y mundo reflejen la misma progresion.
 - La configuracion vive en modulos separados para poder iterar balance rapido.
 - El MVP usa un solo perro por salida de caza.
 

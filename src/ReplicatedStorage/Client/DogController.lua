@@ -167,14 +167,16 @@ end
 
 local function buildStatusText(payload)
     local preyText = payload.activePreyName or "Sin presa marcada"
+    local preyStateText = payload.activePreyState or "-"
 
     return string.format(
-        "%s (%s)  |  Estado: %s  |  Orden: %s\nPresa: %s  |  Bolsa: %d  |  Monedas: %d",
+        "%s (%s)  |  Estado: %s  |  Orden: %s\nPresa: %s (%s)  |  Bolsa: %d  |  Monedas: %d",
         payload.dogName,
         payload.dogBreed,
         payload.dogState,
         payload.lastCommand,
         preyText,
+        preyStateText,
         payload.baggedPrey,
         payload.coins
     )

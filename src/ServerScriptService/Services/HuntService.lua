@@ -23,6 +23,17 @@ local preyVisualsByType = {
     },
 }
 
+local preyStatePresentation = {
+    [Constants.PreyState.Detected] = {
+        text = "Objetivo detectado",
+        color = Color3.fromRGB(27, 35, 26),
+    },
+    [Constants.PreyState.Retrievable] = {
+        text = "Listo para cobrar",
+        color = Color3.fromRGB(34, 60, 31),
+    },
+}
+
 local function getCharacterRootPart(player)
     local character = player.Character
     if not character then
@@ -72,13 +83,13 @@ local function createPreyInstance(preyDefinition, ownerUserId, spawnPosition)
     label.Name = "Label"
     label.Size = UDim2.fromScale(1, 1)
     label.BackgroundTransparency = 0.2
-    label.BackgroundColor3 = Color3.fromRGB(27, 35, 26)
+    label.BackgroundColor3 = preyStatePresentation[Constants.PreyState.Detected].color
     label.BorderSizePixel = 0
     label.Font = Enum.Font.GothamSemibold
     label.TextColor3 = Color3.fromRGB(244, 236, 219)
     label.TextSize = 14
     label.TextWrapped = true
-    label.Text = string.format("%s\nObjetivo detectado", preyDefinition.displayName)
+    label.Text = string.format("%s\n%s", preyDefinition.displayName, preyStatePresentation[Constants.PreyState.Detected].text)
     label.Parent = billboard
 
     local corner = Instance.new("UICorner")
@@ -86,6 +97,23 @@ local function createPreyInstance(preyDefinition, ownerUserId, spawnPosition)
     corner.Parent = label
 
     return part
+end
+
+local function updatePreyPresentation(activeTarget)
+    local instance = activeTarget.instance
+    if not instance or not instance.Parent then
+        return
+    end
+
+    local billboard = instance:FindFirstChild("PreyBillboard")
+    local label = billboard and billboard:FindFirstChild("Label")
+    local presentation = preyStatePresentation[activeTarget.state]
+    if not label or not presentation then
+        return
+    end
+
+    label.BackgroundColor3 = presentation.color
+    label.Text = string.format("%s\n%s", activeTarget.definition.displayName, presentation.text)
 end
 
 function HuntService.init()
@@ -147,11 +175,37 @@ function HuntService.init()
             definition = preyDefinition,
             instance = preyInstance,
             position = preyInstance.Position,
+            state = Constants.PreyState.Detected,
         }
 
         self.activeTargets[player] = activeTarget
+        updatePreyPresentation(activeTarget)
 
         return activeTarget
+    end
+
+    function service:updateActiveTarget(player, dogPosition)
+        local activeTarget = self.activeTargets[player]
+        if not activeTarget then
+            return nil
+        end
+
+        local instance = activeTarget.instance
+        if not instance or not instance.Parent then
+            self.activeTargets[player] = nil
+            return nil
+        end
+
+        if activeTarget.state == Constants.PreyState.Detected and dogPosition then
+            local distance = (instance.Position - dogPosition).Magnitude
+            if distance <= Constants.WorldPrey.ActivationDistance then
+                activeTarget.state = Constants.PreyState.Retrievable
+                updatePreyPresentation(activeTarget)
+                return activeTarget
+            end
+        end
+
+        return nil
     end
 
     function service:retrieveActiveTarget(player, dogPosition)
@@ -164,6 +218,10 @@ function HuntService.init()
         if not instance or not instance.Parent then
             self.activeTargets[player] = nil
             return nil, "La presa activa ya no existe en el mundo."
+        end
+
+        if activeTarget.state ~= Constants.PreyState.Retrievable then
+            return nil, "La presa todavia no esta lista. Deja que el perro termine de marcarla."
         end
 
         if dogPosition and (instance.Position - dogPosition).Magnitude > Constants.WorldPrey.RetrieveDistance then

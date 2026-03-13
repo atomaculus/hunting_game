@@ -7,8 +7,11 @@ Proyecto base para un juego de caza en Roblox, desarrollado con Rojo, Roblox Stu
 - El cliente muestra HUD y recibe input `Z`, `X`, `C`.
 - El servidor procesa `Follow`, `Search` y `Retrieve`.
 - Economia y seleccion basica de presa ya estan conectadas.
-- El perro todavia no existe como entidad visible en el mundo.
-- El loop de hunting todavia es logico, no espacial.
+- El perro ya existe como placeholder visible en el mundo.
+- `Search` genera una presa placeholder visible en mundo.
+- La presa pasa por estados simples `Detected` -> `Retrievable`.
+- `Retrieve` solo cobra cuando la presa ya quedo lista en mundo.
+- El loop de hunting sigue siendo placeholder, pero ya no es puramente abstracto.
 
 ## Objetivo inmediato
 Pasar de una mecanica abstracta de perro a un loop jugable visible en mundo:
@@ -56,7 +59,7 @@ Estado: hecho en una primera version.
 - follow basico
 - mostrar estados en mundo
 
-Estado: en progreso. Placeholder, spawn y follow basico listos; falta conectar hunting real en mundo.
+Estado: cumplido en placeholder funcional. Queda polish y comportamiento mas avanzado para etapas posteriores.
 
 ### Fase 3. Hunting real
 - crear presa visible o dummy de prueba
@@ -64,7 +67,13 @@ Estado: en progreso. Placeholder, spawn y follow basico listos; falta conectar h
 - agregar tiempo, distancia y resolucion real
 - definir resultado de caza
 
-Estado: en progreso. `Search` y `Retrieve` ya pueden colgarse de una presa placeholder visible, y `Search` mantiene al perro alrededor del objetivo; faltan tiempo, distancia jugable real y resolucion de caza.
+Estado: en progreso. Ya existe una presa placeholder visible con estados simples (`Detected` -> `Retrievable`), `Search` mantiene al perro alrededor del objetivo y `Retrieve` ya no resuelve instantaneamente. Falta convertir esto en hunting jugable real.
+
+### Proximo corte sugerido
+- agregar tiempo de marcado o progreso visible durante `Search`
+- separar mejor deteccion de presa y cobro
+- preparar una presa dummy mas clara para futura integracion con disparo
+- definir como se cancela o persiste una presa activa sin desaparecer de forma artificial
 
 ### Fase 4. Integracion perro + presa
 - perro busca objetivo

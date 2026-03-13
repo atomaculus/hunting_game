@@ -17,6 +17,11 @@ Constants.DogState = {
     Exhausted = "Exhausted",
 }
 
+Constants.PreyState = {
+    Detected = "Detected",
+    Retrievable = "Retrievable",
+}
+
 Constants.DefaultDogName = "Labrador cobrador"
 Constants.DefaultDogBreedKey = "LabradorRetriever"
 Constants.DefaultCoins = 0
@@ -37,6 +42,7 @@ Constants.WorldPrey = {
     SearchDistanceMin = 18,
     SearchDistanceMax = 30,
     SearchLateralSpread = 12,
+    ActivationDistance = 6,
     RetrieveDistance = 10,
     BillboardStudsOffset = Vector3.new(0, 3.5, 0),
     DogSearchOrbitOffset = Vector3.new(-4, 0, 3),
