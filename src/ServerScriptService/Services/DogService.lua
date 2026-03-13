@@ -152,7 +152,7 @@ local function updateBillboard(profile)
         return
     end
 
-    local preyName = profile.activePrey and profile.activePrey.displayName or "Sin presa"
+    local preyName = profile.activePrey and profile.activePrey.definition.displayName or "Sin presa"
     label.Text = string.format("%s\n%s | %s\n%s", profile.dogName, profile.dogState, profile.lastCommand, preyName)
 end
 
@@ -177,7 +177,7 @@ local function buildStatusPayload(profile, message)
         dogBreed = profile.dogBreed,
         dogState = profile.dogState,
         lastCommand = profile.lastCommand,
-        activePreyName = profile.activePrey and profile.activePrey.displayName or nil,
+        activePreyName = profile.activePrey and profile.activePrey.definition.displayName or nil,
         baggedPrey = profile.baggedPrey,
         coins = profile.coins,
         message = message,
@@ -268,6 +268,7 @@ function DogService.init(dependencies)
         if profile then
             destroyDogModel(profile)
         end
+        huntService:clearActiveTarget(player)
         playerProfiles[player] = nil
     end)
 
@@ -288,20 +289,28 @@ function DogService.init(dependencies)
         local message
 
         if commandName == Constants.DogCommands.Follow then
+            huntService:clearActiveTarget(player)
             profile.activePrey = nil
             profile.dogState = Constants.DogState.Healthy
             message = string.format("%s vuelve a tu lado y espera la siguiente orden.", profile.dogName)
         elseif commandName == Constants.DogCommands.Search then
-            profile.activePrey = huntService:getNextPrey()
-            profile.dogState = Constants.DogState.Healthy
-            message = string.format(
-                "%s detecto una presa: %s. Usa C para cobrar.",
-                profile.dogName,
-                profile.activePrey.displayName
-            )
+            local activeTarget, errorMessage = huntService:createSearchTarget(player)
+            if activeTarget then
+                profile.activePrey = activeTarget
+                profile.dogState = Constants.DogState.Healthy
+                message = string.format(
+                    "%s marco una presa en el mundo: %s. Acercate y usa C para cobrar.",
+                    profile.dogName,
+                    profile.activePrey.definition.displayName
+                )
+            else
+                profile.activePrey = nil
+                message = string.format("%s no pudo marcar una presa. %s", profile.dogName, errorMessage)
+            end
         elseif commandName == Constants.DogCommands.Retrieve then
-            if profile.activePrey then
-                local prey = profile.activePrey
+            local dogPosition = profile.dogModel and profile.dogModel.PrimaryPart and profile.dogModel.PrimaryPart.Position
+            local prey, errorMessage = huntService:retrieveActiveTarget(player, dogPosition)
+            if prey then
                 profile.activePrey = nil
                 profile.baggedPrey += 1
                 local totalCoins = economyService:awardCoins(profile, prey.sellValue)
@@ -313,7 +322,7 @@ function DogService.init(dependencies)
                     totalCoins
                 )
             else
-                message = string.format("%s no tiene una presa marcada para cobrar.", profile.dogName)
+                message = string.format("%s no pudo cobrar. %s", profile.dogName, errorMessage)
             end
         end
 

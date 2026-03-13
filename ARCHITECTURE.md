@@ -18,7 +18,7 @@ Contiene la autoridad del juego.
 
 - `Bootstrap.server.lua`: inicializa servicios y remotes.
 - `Services/DogService.lua`: seguimiento del estado del perro, hambre, comandos y placeholder visible en `Workspace`.
-- `Services/HuntService.lua`: spawns, deteccion de presas, huida y resultado de la caza.
+- `Services/HuntService.lua`: spawns, placeholders de presas activas, deteccion, huida y resultado de la caza.
 - `Services/EconomyService.lua`: venta de presas, monedas y costos.
 
 ### StarterPlayerScripts
