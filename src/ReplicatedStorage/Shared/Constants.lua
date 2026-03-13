@@ -20,6 +20,17 @@ Constants.DogState = {
 Constants.DefaultDogName = "Labrador cobrador"
 Constants.DefaultDogBreedKey = "LabradorRetriever"
 Constants.DefaultCoins = 0
+Constants.WorldDogFolderName = "Dogs"
+
+Constants.WorldDog = {
+    SpawnOffset = Vector3.new(4, 0, 4),
+    FollowOffset = Vector3.new(-3, 0, 5),
+    SearchOffset = Vector3.new(0, 0, 10),
+    RetrieveOffset = Vector3.new(2, 0, 7),
+    FollowSpeed = 18,
+    TeleportDistance = 24,
+    BillboardStudsOffset = Vector3.new(0, 4.5, 0),
+}
 
 Constants.InputBindings = {
     Follow = Enum.KeyCode.Z,

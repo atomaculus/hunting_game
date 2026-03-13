@@ -11,8 +11,6 @@ function HuntService.init()
         nextPreyIndex = 1,
     }
 
-    print("HuntService initialized")
-
     function service:getNextPrey()
         local preyKey = orderedPreyKeys[self.nextPreyIndex]
         local prey = PreyConfig[preyKey]

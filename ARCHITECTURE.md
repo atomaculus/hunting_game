@@ -17,7 +17,7 @@ Contiene datos y modulos que necesitan cliente y servidor.
 Contiene la autoridad del juego.
 
 - `Bootstrap.server.lua`: inicializa servicios y remotes.
-- `Services/DogService.lua`: seguimiento del estado del perro, hambre y comandos.
+- `Services/DogService.lua`: seguimiento del estado del perro, hambre, comandos y placeholder visible en `Workspace`.
 - `Services/HuntService.lua`: spawns, deteccion de presas, huida y resultado de la caza.
 - `Services/EconomyService.lua`: venta de presas, monedas y costos.
 
@@ -30,6 +30,7 @@ Contiene experiencia local del jugador.
 ## Criterios de diseno
 - El servidor decide economia, presas validas, resultados de caza y estado final del perro.
 - El cliente solo manda intenciones y muestra feedback.
+- La representacion visible inicial del perro tambien la crea y mueve el servidor para evitar divergencias cliente-servidor.
 - La configuracion vive en modulos separados para poder iterar balance rapido.
 - El MVP usa un solo perro por salida de caza.
 

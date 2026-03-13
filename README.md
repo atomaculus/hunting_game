@@ -56,7 +56,7 @@ Estado: hecho en una primera version.
 - follow basico
 - mostrar estados en mundo
 
-Estado: pendiente.
+Estado: en progreso. Placeholder, spawn y follow basico listos; falta conectar hunting real en mundo.
 
 ### Fase 3. Hunting real
 - crear presa visible o dummy de prueba
