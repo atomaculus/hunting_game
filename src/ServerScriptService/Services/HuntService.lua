@@ -34,6 +34,10 @@ local preyStatePresentation = {
     },
 }
 
+local function getProgressStep(progress)
+    return math.floor(math.clamp(progress, 0, 1) * Constants.WorldPrey.ProgressSteps + 0.0001)
+end
+
 local function getCharacterRootPart(player)
     local character = player.Character
     if not character then
@@ -113,7 +117,13 @@ local function updatePreyPresentation(activeTarget)
     end
 
     label.BackgroundColor3 = presentation.color
-    label.Text = string.format("%s\n%s", activeTarget.definition.displayName, presentation.text)
+
+    local detailText = presentation.text
+    if activeTarget.state == Constants.PreyState.Detected then
+        detailText = string.format("%s (%d%%)", presentation.text, math.floor((activeTarget.progress or 0) * 100 + 0.5))
+    end
+
+    label.Text = string.format("%s\n%s", activeTarget.definition.displayName, detailText)
 end
 
 function HuntService.init()
@@ -176,6 +186,10 @@ function HuntService.init()
             instance = preyInstance,
             position = preyInstance.Position,
             state = Constants.PreyState.Detected,
+            progress = 0,
+            startedAt = os.clock(),
+            markDuration = Constants.WorldPrey.MarkDurationSeconds,
+            lastReportedProgressStep = 0,
         }
 
         self.activeTargets[player] = activeTarget
@@ -199,9 +213,36 @@ function HuntService.init()
         if activeTarget.state == Constants.PreyState.Detected and dogPosition then
             local distance = (instance.Position - dogPosition).Magnitude
             if distance <= Constants.WorldPrey.ActivationDistance then
-                activeTarget.state = Constants.PreyState.Retrievable
-                updatePreyPresentation(activeTarget)
-                return activeTarget
+                local elapsed = os.clock() - activeTarget.startedAt
+                local nextProgress = math.clamp(elapsed / activeTarget.markDuration, 0, 1)
+                local nextProgressStep = getProgressStep(nextProgress)
+                local progressChanged = nextProgressStep > activeTarget.lastReportedProgressStep
+
+                activeTarget.progress = nextProgress
+                if progressChanged then
+                    activeTarget.lastReportedProgressStep = nextProgressStep
+                    updatePreyPresentation(activeTarget)
+                end
+
+                if nextProgress >= 1 then
+                    activeTarget.progress = 1
+                    activeTarget.state = Constants.PreyState.Retrievable
+                    updatePreyPresentation(activeTarget)
+
+                    return {
+                        activeTarget = activeTarget,
+                        progressChanged = true,
+                        stateChanged = true,
+                    }
+                end
+
+                if progressChanged then
+                    return {
+                        activeTarget = activeTarget,
+                        progressChanged = true,
+                        stateChanged = false,
+                    }
+                end
             end
         end
 

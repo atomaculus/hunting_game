@@ -173,7 +173,20 @@ local function updateBillboard(profile)
 
     local preyName = profile.activePrey and profile.activePrey.definition.displayName or "Sin presa"
     local preyState = profile.activePrey and profile.activePrey.state or "-"
-    label.Text = string.format("%s\n%s | %s\n%s | %s", profile.dogName, profile.dogState, profile.lastCommand, preyName, preyState)
+    local preyProgressText = "-"
+    if profile.activePrey and profile.activePrey.state == Constants.PreyState.Detected then
+        preyProgressText = string.format("%d%%", math.floor((profile.activePrey.progress or 0) * 100 + 0.5))
+    end
+
+    label.Text = string.format(
+        "%s\n%s | %s\n%s | %s | %s",
+        profile.dogName,
+        profile.dogState,
+        profile.lastCommand,
+        preyName,
+        preyState,
+        preyProgressText
+    )
 end
 
 local function buildInitialProfile()
@@ -199,6 +212,7 @@ local function buildStatusPayload(profile, message)
         lastCommand = profile.lastCommand,
         activePreyName = profile.activePrey and profile.activePrey.definition.displayName or nil,
         activePreyState = profile.activePrey and profile.activePrey.state or nil,
+        activePreyProgress = profile.activePrey and profile.activePrey.progress or nil,
         baggedPrey = profile.baggedPrey,
         coins = profile.coins,
         message = message,
@@ -356,15 +370,33 @@ function DogService.init(dependencies)
             local dogModel = profile.dogModel
             local body = dogModel and dogModel.PrimaryPart
             local targetPosition, facingDirection = getDogTargetPosition(player, profile)
-            local stateChange = body and huntService:updateActiveTarget(player, body.Position)
-            if stateChange and profile.activePrey == stateChange then
+            local huntUpdate = body and huntService:updateActiveTarget(player, body.Position)
+            if huntUpdate and profile.activePrey == huntUpdate.activeTarget then
                 updateBillboard(profile)
-                sendStatus(
-                    dogStatusRemote,
-                    player,
-                    profile,
-                    string.format("%s dejo %s lista para cobrar.", profile.dogName, stateChange.definition.displayName)
-                )
+                if huntUpdate.stateChanged then
+                    sendStatus(
+                        dogStatusRemote,
+                        player,
+                        profile,
+                        string.format(
+                            "%s dejo %s lista para cobrar.",
+                            profile.dogName,
+                            huntUpdate.activeTarget.definition.displayName
+                        )
+                    )
+                elseif huntUpdate.progressChanged then
+                    sendStatus(
+                        dogStatusRemote,
+                        player,
+                        profile,
+                        string.format(
+                            "%s sigue marcando %s (%d%%).",
+                            profile.dogName,
+                            huntUpdate.activeTarget.definition.displayName,
+                            math.floor((huntUpdate.activeTarget.progress or 0) * 100 + 0.5)
+                        )
+                    )
+                end
             end
 
             if body and targetPosition and facingDirection then

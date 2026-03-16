@@ -168,6 +168,9 @@ end
 local function buildStatusText(payload)
     local preyText = payload.activePreyName or "Sin presa marcada"
     local preyStateText = payload.activePreyState or "-"
+    if payload.activePreyProgress and payload.activePreyState == "Detected" then
+        preyStateText = string.format("%s %d%%", preyStateText, math.floor(payload.activePreyProgress * 100 + 0.5))
+    end
 
     return string.format(
         "%s (%s)  |  Estado: %s  |  Orden: %s\nPresa: %s (%s)  |  Bolsa: %d  |  Monedas: %d",

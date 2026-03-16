@@ -10,6 +10,7 @@ Proyecto base para un juego de caza en Roblox, desarrollado con Rojo, Roblox Stu
 - El perro ya existe como placeholder visible en el mundo.
 - `Search` genera una presa placeholder visible en mundo.
 - La presa pasa por estados simples `Detected` -> `Retrievable`.
+- `Search` ahora muestra progreso visible de marcado en HUD y billboards.
 - `Retrieve` solo cobra cuando la presa ya quedo lista en mundo.
 - El loop de hunting sigue siendo placeholder, pero ya no es puramente abstracto.
 
@@ -67,10 +68,9 @@ Estado: cumplido en placeholder funcional. Queda polish y comportamiento mas ava
 - agregar tiempo, distancia y resolucion real
 - definir resultado de caza
 
-Estado: en progreso. Ya existe una presa placeholder visible con estados simples (`Detected` -> `Retrievable`), `Search` mantiene al perro alrededor del objetivo y `Retrieve` ya no resuelve instantaneamente. Falta convertir esto en hunting jugable real.
+Estado: en progreso. Ya existe una presa placeholder visible con estados simples (`Detected` -> `Retrievable`), `Search` mantiene al perro alrededor del objetivo, el marcado tiene progreso visible y `Retrieve` ya no resuelve instantaneamente. Falta convertir esto en hunting jugable real.
 
 ### Proximo corte sugerido
-- agregar tiempo de marcado o progreso visible durante `Search`
 - separar mejor deteccion de presa y cobro
 - preparar una presa dummy mas clara para futura integracion con disparo
 - definir como se cancela o persiste una presa activa sin desaparecer de forma artificial

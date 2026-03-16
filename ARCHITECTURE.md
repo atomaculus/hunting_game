@@ -17,8 +17,8 @@ Contiene datos y modulos que necesitan cliente y servidor.
 Contiene la autoridad del juego.
 
 - `Bootstrap.server.lua`: inicializa servicios y remotes.
-- `Services/DogService.lua`: seguimiento del estado del perro, hambre, comandos y placeholder visible en `Workspace`.
-- `Services/HuntService.lua`: spawns, placeholders de presas activas, estados de presa (`Detected` / `Retrievable`), deteccion, huida y resultado de la caza.
+- `Services/DogService.lua`: seguimiento del estado del perro, hambre, comandos, placeholder visible en `Workspace` y sincronizacion de progreso visible de marcado.
+- `Services/HuntService.lua`: spawns, placeholders de presas activas, estados de presa (`Detected` / `Retrievable`), progreso de marcado, deteccion, huida y resultado de la caza.
 - `Services/EconomyService.lua`: venta de presas, monedas y costos.
 
 ### StarterPlayerScripts
